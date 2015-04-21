@@ -1,7 +1,8 @@
 (function( $ ) {
 	var requests = {};
 	var zipValid = {
-		us: /[0-9]{5}(-[0-9]{4})?/
+		us: /[0-9]{5}(-[0-9]{4})?/,
+		ca: /^[ABCEGHJKLMNPRSTVXY]{1}\d{1}[A-Z]{1} *\d{1}[A-Z]{1}\d{1}$/
 	};
 
 	$.ziptastic = function(country, zip, callback){
@@ -37,11 +38,17 @@
 			var ele = $(this);
 
 			ele.on('keyup', function() {
-				var zip = ele.val();
+				var zip = ele.val(),
+						country;
 
-				// TODO Non-US zip codes?
-				if(zipValid.us.test(zip)) {
-					$.ziptastic(zip, function(country, state, state_short, city) {
+				if (zipValid.us.test(zip)) {
+					country = "US";
+				} else if (zipValid.ca.test(zip)) {
+					country = "CA";
+				}
+
+				if (country !== undefined && country !== "") {
+					$.ziptastic(country, zip, function(country, state, state_short, city) {
 						// Trigger the updated information
 						ele.trigger('zipChange', [country, state, state_short, city, zip]);
 					});
